@@ -1,1 +1,1 @@
-worker: python report_ss.py
+worker: python __main__.py
