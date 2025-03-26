@@ -2,6 +2,27 @@ import requests
 import mysql.connector
 import json
 import os
+import datetime
+
+LOG_FILE = "/tmp/last_run.log"  # Arquivo temporário no sistema
+
+def was_already_run_today():
+    if not os.path.exists(LOG_FILE):
+        return False
+    with open(LOG_FILE, "r") as file:
+        last_run_date = file.read().strip()
+    return last_run_date == datetime.date.today().isoformat()
+
+def update_run_log():
+    with open(LOG_FILE, "w") as file:
+        file.write(datetime.date.today().isoformat())
+
+if not was_already_run_today():
+    print("Executando script...")
+    # Seu código principal aqui (baixar os reports, salvar no DB, etc.)
+    update_run_log()
+else:
+    print("Script já rodou hoje. Saindo...")
 
 
 main_url = "https://console.springserve.com/api/v0/"
