@@ -1,0 +1,1 @@
+0 0 * * * python /app/report_ss.py >> /app/logs/report.log 2>&1
