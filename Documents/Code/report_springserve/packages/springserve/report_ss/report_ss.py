@@ -1,10 +1,8 @@
 import requests
 import mysql.connector
 import json
-#from dotenv import load_dotenv
 import os
 
-#load_dotenv()  # Carrega as variáveis do .env
 
 main_url = "https://console.springserve.com/api/v0/"
 auth_url = f"{main_url}auth"
