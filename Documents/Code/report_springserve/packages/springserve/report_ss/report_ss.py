@@ -40,7 +40,7 @@ try:
 
             # filtros = [{"type": "SupplyTag", "id": "846641"}]
             params = {
-            "date_range": "last 7 days",
+            "date_range": "yesterday",
             "interval": "day",
             "dimensions": [
                 "device_id",
