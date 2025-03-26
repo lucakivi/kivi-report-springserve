@@ -1,1 +1,1 @@
-web: python report_ss.py
+worker: python report_ss.py
