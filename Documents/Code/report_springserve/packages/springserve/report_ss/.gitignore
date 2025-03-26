@@ -1,2 +1,4 @@
 # Ignore arquivos de ambiente
 .env
+
+Documents/Code/report_springserve/package/*
