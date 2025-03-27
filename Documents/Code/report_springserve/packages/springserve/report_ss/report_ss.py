@@ -80,7 +80,8 @@ try:
                 "content_series",
                 "content_title",
                 "language",
-                "device_brand"
+                "device_brand",
+                "supply_tag_id"
             ],
             "metrics": [
                 "total_requests",
@@ -93,7 +94,7 @@ try:
                 "cpm",
                 "net_ppm"
             ],
-            "supply_tag_ids": ["846641"],
+            "supply_tag_ids": ["846641", "881829", "881835", "881834", "881833"],
             "async": "false"
         }
 
@@ -110,7 +111,7 @@ try:
 
                 try:
                     for dado in report_data:
-                        colunas = "(date, content_genre, content_title, content_episode, content_id, channel_name, language, content_custom_1_param, requests, imps, req_fill_percent, revenue, rpm, cpm, ppm, device_brand, cost)"
+                        colunas = "(date, content_genre, content_title, content_episode, content_id, channel_name, language, content_custom_1_param, requests, imps, req_fill_percent, revenue, rpm, cpm, ppm, device_brand, cost, supply_tag_id)"
                         valores = (
                             dado.get("date"),
                             dado.get("content_genre"),
@@ -128,9 +129,10 @@ try:
                             dado.get("cpm"),
                             dado.get("net_ppm"),
                             dado.get("device_brand"),
-                            dado.get("cost")
+                            dado.get("cost"),
+                            dado.get("supply_tag_id")
                         )
-                        sql = f"INSERT INTO {nome_tabela} {colunas} VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                        sql = f"INSERT INTO {nome_tabela} {colunas} VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
                         cursor.execute(sql, valores)
 
                     mydb.commit()
