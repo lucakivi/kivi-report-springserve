@@ -6,32 +6,61 @@ import datetime
 import os
 from datetime import datetime
 
-LAST_RUN_FILE = "last_run.txt"
+def verificar_execucao():
+    """Verifica se o script já rodou hoje"""
+    try:
+        mydb = mysql.connector.connect(
+            host=os.getenv("DB_HOST"),
+            port=os.getenv("DB_PORT"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            database=os.getenv("DB_NAME")
+        )
+        cursor = mydb.cursor()
 
-def ja_rodou_hoje():
-    """Verifica se o script já foi executado hoje"""
-    hoje = datetime.now().strftime("%Y-%m-%d")
+        data_hoje = datetime.now().date()
+        cursor.execute("SELECT COUNT(*) FROM execution_log WHERE last_run = %s", (data_hoje,))
+        resultado = cursor.fetchone()[0]
 
-    if os.path.exists(LAST_RUN_FILE):
-        with open(LAST_RUN_FILE, "r") as f:
-            ultima_execucao = f.read().strip()
+        cursor.close()
+        mydb.close()
 
-        if ultima_execucao == hoje:
-            return True  # Já rodou hoje
+        if resultado > 0:
+            print("Script já rodou hoje. Saindo...")
+            return True  # Já executado hoje
+        return False  # Ainda não executado hoje
 
-    return False  # Ainda não rodou hoje
+    except mysql.connector.Error as err:
+        print(f"Erro ao verificar execução: {err}")
+        return False
+
 
 def registrar_execucao():
-    """Registra a data atual no arquivo para evitar nova execução no mesmo dia"""
-    hoje = datetime.now().strftime("%Y-%m-%d")
-    with open(LAST_RUN_FILE, "w") as f:
-        f.write(hoje)
+    """Registra a execução do script"""
+    try:
+        mydb = mysql.connector.connect(
+            host=os.getenv("DB_HOST"),
+            port=os.getenv("DB_PORT"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            database=os.getenv("DB_NAME")
+        )
+        cursor = mydb.cursor()
 
-# Verificar se já rodou hoje
-if ja_rodou_hoje():
-    print("Script já rodou hoje. Saindo...")
-    exit()  # Finaliza o programa
+        data_hoje = datetime.now().date()
+        cursor.execute("INSERT INTO execution_log (last_run) VALUES (%s)", (data_hoje,))
+        mydb.commit()
 
+        print("Execução registrada com sucesso.")
+
+        cursor.close()
+        mydb.close()
+    except mysql.connector.Error as err:
+        print(f"Erro ao registrar execução: {err}")
+
+if verificar_execucao():
+    exit()  # Se já rodou hoje, sai do script
+    
 print("Executando script...")  # Apenas para teste
 
 main_url = "https://console.springserve.com/api/v0/"
