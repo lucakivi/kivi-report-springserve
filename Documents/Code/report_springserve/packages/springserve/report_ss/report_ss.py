@@ -4,18 +4,27 @@ import json
 import os
 import datetime
 
-LOG_FILE = "/tmp/last_run.log"  # Arquivo temporário no sistema
+db_config = {
+    "host": os.getenv("DB_HOST"),
+    "user": os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASSWORD"),
+    "database": os.getenv("DB_NAME"),
+}
 
 def was_already_run_today():
-    if not os.path.exists(LOG_FILE):
-        return False
-    with open(LOG_FILE, "r") as file:
-        last_run_date = file.read().strip()
-    return last_run_date == datetime.date.today().isoformat()
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor()
+    cursor.execute("SELECT last_run FROM execution_log ORDER BY id DESC LIMIT 1")
+    result = cursor.fetchone()
+    conn.close()
+    return result and result[0] == datetime.date.today()
 
 def update_run_log():
-    with open(LOG_FILE, "w") as file:
-        file.write(datetime.date.today().isoformat())
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO execution_log (last_run) VALUES (%s)", (datetime.date.today(),))
+    conn.commit()
+    conn.close()
 
 if not was_already_run_today():
     print("Executando script...")
@@ -23,6 +32,7 @@ if not was_already_run_today():
     update_run_log()
 else:
     print("Script já rodou hoje. Saindo...")
+
 
 
 main_url = "https://console.springserve.com/api/v0/"
