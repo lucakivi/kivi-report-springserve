@@ -10,11 +10,12 @@ LAST_RUN_FILE = "last_run.txt"
 
 def ja_rodou_hoje():
     """Verifica se o script já foi executado hoje"""
+    hoje = datetime.now().strftime("%Y-%m-%d")
+
     if os.path.exists(LAST_RUN_FILE):
         with open(LAST_RUN_FILE, "r") as f:
             ultima_execucao = f.read().strip()
 
-        hoje = datetime.now().strftime("%Y-%m-%d")
         if ultima_execucao == hoje:
             return True  # Já rodou hoje
 
@@ -22,15 +23,16 @@ def ja_rodou_hoje():
 
 def registrar_execucao():
     """Registra a data atual no arquivo para evitar nova execução no mesmo dia"""
+    hoje = datetime.now().strftime("%Y-%m-%d")
     with open(LAST_RUN_FILE, "w") as f:
-        f.write(datetime.now().strftime("%Y-%m-%d"))
+        f.write(hoje)
 
 # Verificar se já rodou hoje
 if ja_rodou_hoje():
     print("Script já rodou hoje. Saindo...")
     exit()  # Finaliza o programa
 
-
+print("Executando script...")  # Apenas para teste
 
 main_url = "https://console.springserve.com/api/v0/"
 auth_url = f"{main_url}auth"
@@ -172,5 +174,5 @@ finally:
         mydb.close()
         print("Conexão com o MySQL fechada.")
         
-print("Executando script...")  # Apenas para teste
+
 registrar_execucao()  # Atualiza o arquivo com a data da execução
