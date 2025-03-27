@@ -3,35 +3,32 @@ import mysql.connector
 import json
 import os
 import datetime
+import os
+from datetime import datetime
 
-db_config = {
-    "host": os.getenv("DB_HOST"),
-    "user": os.getenv("DB_USER"),
-    "password": os.getenv("DB_PASSWORD"),
-    "database": os.getenv("DB_NAME"),
-}
+LAST_RUN_FILE = "last_run.txt"
 
-def was_already_run_today():
-    conn = mysql.connector.connect(**db_config)
-    cursor = conn.cursor()
-    cursor.execute("SELECT last_run FROM execution_log ORDER BY id DESC LIMIT 1")
-    result = cursor.fetchone()
-    conn.close()
-    return result and result[0] == datetime.date.today()
+def ja_rodou_hoje():
+    """Verifica se o script já foi executado hoje"""
+    if os.path.exists(LAST_RUN_FILE):
+        with open(LAST_RUN_FILE, "r") as f:
+            ultima_execucao = f.read().strip()
 
-def update_run_log():
-    conn = mysql.connector.connect(**db_config)
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO execution_log (last_run) VALUES (%s)", (datetime.date.today(),))
-    conn.commit()
-    conn.close()
+        hoje = datetime.now().strftime("%Y-%m-%d")
+        if ultima_execucao == hoje:
+            return True  # Já rodou hoje
 
-if not was_already_run_today():
-    print("Executando script...")
-    # Seu código principal aqui (baixar os reports, salvar no DB, etc.)
-    update_run_log()
-else:
+    return False  # Ainda não rodou hoje
+
+def registrar_execucao():
+    """Registra a data atual no arquivo para evitar nova execução no mesmo dia"""
+    with open(LAST_RUN_FILE, "w") as f:
+        f.write(datetime.now().strftime("%Y-%m-%d"))
+
+# Verificar se já rodou hoje
+if ja_rodou_hoje():
     print("Script já rodou hoje. Saindo...")
+    exit()  # Finaliza o programa
 
 
 
@@ -172,3 +169,6 @@ finally:
         cursor.close()
         mydb.close()
         print("Conexão com o MySQL fechada.")
+        
+print("Executando script...")  # Apenas para teste
+registrar_execucao()  # Atualiza o arquivo com a data da execução
