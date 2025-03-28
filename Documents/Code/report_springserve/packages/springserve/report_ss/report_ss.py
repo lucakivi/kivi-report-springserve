@@ -34,6 +34,8 @@ def verificar_execucao():
         print(f"Erro ao verificar execução: {err}")
         return False
 
+if verificar_execucao():
+    exit()  # Se já rodou hoje, sai do script
 
 def registrar_execucao():
     """Registra a execução do script"""
@@ -58,8 +60,7 @@ def registrar_execucao():
     except mysql.connector.Error as err:
         print(f"Erro ao registrar execução: {err}")
 
-if verificar_execucao():
-    exit()  # Se já rodou hoje, sai do script
+
     
 print("Executando script...")  # Apenas para teste
 
